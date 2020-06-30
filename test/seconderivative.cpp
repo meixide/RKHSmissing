@@ -92,6 +92,8 @@ arma::umat findneigh(int n,int numberclose,arma::mat d) {
   
 }
 
+// [[Rcpp::export]]
+
 arma::mat findwneigh(int n,int numberclose,arma::mat w,arma::umat neigh) {
   
   arma::mat wsmall(n,numberclose);
@@ -104,6 +106,29 @@ arma::mat findwneigh(int n,int numberclose,arma::mat w,arma::umat neigh) {
   
   return wsmall;
 }
+
+// [[Rcpp::export]]
+
+arma::mat KernelG(arma::mat x,float tau) {
+  
+  int m=x.n_rows;
+  float taum2=1./pow(tau,2);
+  
+  
+  arma::mat fil_ig=arma::repmat(x.row(0)*trans(x.row(0)),1,m);
+  
+  for(int i = 1; i < m; i++){
+    fil_ig=join_cols(fil_ig,arma::repmat(x.row(i)*trans(x.row(i)),1,m));
+  }
+  
+  arma::mat col_ig=trans(fil_ig);
+  arma::mat cross=x*trans(x);
+  
+  return arma::exp(-(fil_ig+col_ig-2*cross)*taum2);
+  
+}
+
+
 
 
 // [[Rcpp::export]]

@@ -8,12 +8,12 @@ library("Rcpp")
 
 sourceCpp("ModelFreeVS.cpp")
 #install.packages("RcppProgress")
-library("RcppProgress") #hai que engadir tres liñas por rutina
+library("RcppProgress") #hai que engadir tres li?as por rutina
 
 #setwd("C:/Users/Carlos M Garcia/Google Drive/Marcos/missingdata/R/modelfreecensoredfinal")
 #setwd("/home/carlos/R")
-n=200
-p=8
+n=500
+p=10
 
 pesos=rep(1,n)
 wcens= pesos%*%t(pesos);
