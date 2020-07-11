@@ -133,32 +133,49 @@ arma::mat Secondderivative(int n,int p,int numberclose,arma::mat x,arma::vec y,a
   arma::mat M=arma::zeros(n*p,n*p);
   arma::mat B=arma::zeros(n,n);
   arma::mat A=arma::zeros(p,p);
-  arma::vec yij=arma::zeros(p);
-  arma::vec ki=arma::zeros(n);
+  int a=0;
+  int b=0;
+  int c=0;
+  int d=0;
   
-
-  int a,b,c,d=0;
   
   for(int i=0;i<n;i++) {
-    ki=K.col(i);
-   // B=K.col(i)*arma::trans(K.col(i));
-    for(int j=0;j<numberclose;j++) {
-     // A=arma::trans()*(x.row(i)-x.row(neigh(i,j)));
-     yij=arma::trans(x.row(i)-x.row(neigh(i,j)));
-      for(a=0;a<p;a++) {
-        for(b=0;b<p;b++) {
-          for(c=0;c<n;c++) {
-            for(d=0;d<n;d++){
-      //M+=2*wsmall[n*j+i] *arma::kron(A,B)*(1./(n*(n-1)));
     
-      M(a*n+c,b*n+d)+=2*wsmall[n*j+i]*yij(a)*yij(b)*ki(c)*ki(d)*(1./(n*(n-1)));
+    B=K.col(i)*arma::trans(K.col(i));
+    A=arma::zeros(p,p);
+    for(int j=0;j<numberclose;j++) {
+      A=A+wsmall(i,j)*arma::trans(x.row(i)-x.row(neigh(i,j)))*(x.row(i)-x.row(neigh(i,j)));
+    }
+    
+    for(a=0;a<p;a++) {
+      for(b=a;b<p;b++) {
+        for(c=0;c<n;c++) {
+          
+          if(b==a) {
+            for(d=c;d<n;d++){
+              
+              
+              M(a*n+c,b*n+d)+=A(a,b)*B(c,d);
+              
             }
+          } else {
+            for(d=0;d<n;d++){
+              
+              
+              M(a*n+c,b*n+d)+=A(a,b)*B(c,d);
+              
+            }
+            
           }
+          
         }
       }
     }
+    
+    //M=M+arma::kron(A,B);
+  
   }
-  return M;
+  return arma::symmatu(M)*(2./(n*(n-1)));
 }
 
 //Calculate wij matrix (see paper for more details)

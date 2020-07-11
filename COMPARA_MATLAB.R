@@ -7,10 +7,9 @@ library("Rcpp")
 
 sourceCpp("ModelFreeVS.cpp")
 #install.packages("RcppProgress")
-library("RcppProgress") #hai que engadir tres li?as por rutina
+library("RcppProgress") #hai que engadir tres linhas por rutina
+setwd("~/repodir/RKHSmissing")
 
-#setwd("C:/Users/Carlos M Garcia/Google Drive/Marcos/missingdata/R/modelfreecensoredfinal")
-#setwd("/home/carlos/R")
 n=200
 p=8
 
