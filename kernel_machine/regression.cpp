@@ -8,34 +8,53 @@
 
 using namespace arma;
 
-double logit(vec Xi,vec beta) {
-  return(exp(dot(Xi,beta))/(1+exp(dot(Xi,beta))));
+
+double KernelG(vec x1,vec x2,float tau) {
+  
+  int m=x1.n_elem;
+  float taum2=1./pow(tau,2);
+  vec d;
+  
+  d=x1-x2;
+  
+  return exp(-sqrt(dot(d,d))*taum2);
+  
 }
 
-vec coef(mat X,vec Y,mat W,double lambda) {
+
+
+vec coef(mat X,vec Y,mat W,double lambda,vec mu) {
   
   int i=0;
   int n=X.n_rows;
   int p=X.n_cols;
   vec alphatilde=zeros(n);
   vec beta=zeros(p);
-  vec mu=zeros(n);
+  
   
   mat K=zeros(n,n);
   
-  for (i=0;i<n;i++) {
-    mu(i)=(2*logit(X.row(i),beta));
-  }
+
   
   alphatilde=inv(K+lambda*eye(n,n))*(W*Y+(eye(n,n)-W)*mu);
   return(alphatilde);}
 
 // [[Rcpp::export]]
 
-vec kernel_machine(mat X,vec coef,vec grid) {
+double kernel_machine(mat X,vec Xpred,vec coef,vec grid) {
   int n=X.n_rows;
+  int i;
+  double f=0;
+  double Ki=0;
   mat K=zeros(n,n);
-  vec f=K*coef;
+  
+  
+  for(i=0;i<n;i++){
+    Ki=KernelG(X.row(i),Xpred,2); //OLLO NON VALE PONHER tau=2, como calculo tau?
+    f=f+Ki*coef(i);
+  }
+  
+  
   return(f);
   
 }
