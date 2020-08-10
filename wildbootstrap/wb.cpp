@@ -8,7 +8,7 @@
 
 using namespace arma;
 
-
+// [[Rcpp::export]]
 /*vec coef(mat X,vec Y,mat W,double lambda,vec mu,double sigma) {
   
   int i=0;
@@ -76,67 +76,40 @@ Rcpp::List wildHSIC(mat X,mat Y,int TestType=1,float Alpha=0.05, Kernel_X,Kernel
 
     
    
-    //Dino Sejdinovic, 2013
-  //D. Sejdinovic, A. Gretton and W. Bergsma.  A KERNEL TEST FOR THREE-VARIABLE INTERACTIONS, 2013.
-  
-  //median heuristic bandwidth selection
-  
-float median_heur(mat Z) {
-    
-    size1=size(Z,1);
-  if size1>100 //choose 100 random samples from Z if it contains
-    //more than 100 points
-    [~,ind]=sort(rand(1,size1));
-  Zmed = Z(ind(1:100),:);
-  size1 = 100;
-  else
-    Zmed = Z;
-  end
-    G = sum((Zmed.*Zmed),2);
-  Q = repmat(G,1,size1);
-  R = repmat(G',size1,1);
-  dists = Q + R - 2*(Zmed*Zmed');
-  dists = dists-tril(dists);
-  dists = reshape(dists,size1^2,1);
-  dists = sqrt(dists);
-  sig = sqrt(0.5*median(dists(dists>0)));
-  return(sig);
-  end
-    
-}
-    
-    //Radial basis function inner product
-    //Arthur Gretton
-    
-    //Pattern input format : [pattern1 ; pattern2 ; ...]
-    //Output : p11*p21 p11*p22 ... ; p12*p21 ...
-    
- mat rbf_dot(mat patterns) {
-      sigma = median_heur([patterns]);
-    /*if isnan(sigma)
+   //Radial basis function inner product
+   //Arthur Gretton
+   
+   //Pattern input format : [pattern1 ; pattern2 ; ...]
+   //Output : p11*p21 p11*p22 ... ; p12*p21 ...
+   
+   mat rbf_dot(mat patterns) {
+     sigma = median_heur([patterns]);
+     /*if isnan(sigma)
       sigma = 1;
-    warning('median heuristic failed')
+      warning('median heuristic failed')
       end*/
      // kernel = rbf_dot_deg(X,Y,sigma);
-    
-    //function [H]=rbf_dot_deg(X,Y,deg)
-      
-      size1=size(X);
-    size2=size(Y);
-    
-    G = sum((X.*X),2);
-    H = sum((Y.*Y),2);
-    
-    Q = repmat(G,1,Y._nrow());
-    R = repmat(H',X.n_row(),1);
-    
-    H = Q + R - 2*X*Y';
-    
-    
-    H=exp(-H/2/deg^2);
-    
- return(H)
-      
- }
+     
+     //function [H]=rbf_dot_deg(X,Y,deg)
+     
+     size1=size(X);
+     size2=size(Y);
+     
+     G = sum((X%X),2);
+     H = sum((Y%Y),2);
+     
+     Q = repmat(G,1,Y._nrow());
+     R = repmat(H.t(),X.n_row(),1);
+     
+     H = Q + R - 2*X*Y.t();
+     
+     
+     H=exp(-H/2/deg^2);
+     
+     return(H)
+       
+   }
+  
+
       
       
